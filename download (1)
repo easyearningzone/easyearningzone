@@ -1,0 +1,143 @@
+export type MembershipLevel = 'Free' | 'Silver' | 'Gold' | 'Platinum';
+
+export interface User {
+  id: string;
+  phone: string;
+  email: string;
+  username: string;
+  membership_level: MembershipLevel;
+  password_hash: string;
+  referral_code: string;
+  referred_by_code: string | null;
+  is_verified: boolean;
+  is_suspended?: boolean;
+  full_name?: string;
+  avatar_url?: string;
+  created_at: string;
+}
+
+export type TaskType = 'video' | 'visit' | 'social' | 'survey' | 'quiz';
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  reward_bdt: number;
+  duration_seconds: number;
+  task_type: TaskType;
+  external_url: string;
+  category: string;
+  active: boolean;
+  created_at: string;
+}
+
+export interface UserTask {
+  id: string;
+  user_id: string;
+  task_id: string;
+  completed_at: string;
+  reward_earned: number;
+}
+
+export interface Wallet {
+  id: string;
+  user_id: string;
+  balance_bdt: number;
+  total_earned_bdt: number;
+  total_withdrawn_bdt: number;
+  updated_at: string;
+}
+
+export type WithdrawalStatus = 'Pending' | 'Approved' | 'Rejected' | 'Processing';
+export type MfsProvider = 'bKash' | 'Nagad' | 'Rocket';
+
+export interface Withdrawal {
+  id: string;
+  user_id: string;
+  amount_bdt: number;
+  mfs_provider: MfsProvider;
+  account_number: string;
+  status: WithdrawalStatus;
+  created_at: string;
+  processed_at?: string;
+  reference_id?: string;
+}
+
+export type TransactionType = 
+  | 'Reward' 
+  | 'Withdrawal_Pending' 
+  | 'Withdrawal_Approved' 
+  | 'Withdrawal_Rejected' 
+  | 'Membership_Upgrade'
+  | 'Verification_Fee_Paid'
+  | 'Referral_Bonus'
+  | 'Account_Sale'
+  | 'Account_Purchase';
+
+export interface Transaction {
+  id: string;
+  user_id: string;
+  type: TransactionType;
+  amount: number;
+  description: string;
+  level_generation?: number;
+  created_at: string;
+}
+
+export type PlatformType = 'gmail' | 'fb' | 'insta' | 'tiktok' | 'whatsapp';
+
+export interface MarketplaceListing {
+  id: string;
+  seller_id: string;
+  seller_username: string;
+  platform_type: PlatformType;
+  title: string;
+  description: string;
+  account_details: string; // login credentials, only readable after purchase!
+  price_bdt: number;
+  status: 'available' | 'sold';
+  buyer_id?: string;
+  created_at: string;
+}
+
+export interface AdminAccountSale {
+  id: string;
+  user_id: string;
+  username: string;
+  platform_type: 'gmail' | 'fb' | 'insta';
+  account_email: string;
+  account_password: string;
+  recovery_info: string;
+  additional_notes?: string;
+  price_bdt: number;
+  status: 'Pending' | 'Approved' | 'Rejected' | 'Processing';
+  created_at: string;
+  admin_notes?: string;
+}
+
+export type VerificationRequestStatus = 'Pending' | 'Approved' | 'Rejected' | 'Processing';
+
+export interface VerificationRequest {
+  id: string;
+  user_id: string;
+  username: string;
+  phone: string;
+  mfs_provider: MfsProvider;
+  sender_number: string;
+  trx_id: string;
+  amount: number;
+  status: VerificationRequestStatus;
+  admin_notes?: string;
+  created_at: string;
+}
+
+export interface AdminBuyingRequirement {
+  id: string;
+  platform_type: 'gmail' | 'fb' | 'insta';
+  required_password: string;
+  price_bdt: number;
+  description_guideline: string;
+  active: boolean;
+}
+
+

@@ -1,0 +1,6 @@
+{
+  "name": "Easy Earning BD",
+  "description": "A Micro-Earning and Freelance Task Platform customized for the Bangladeshi market, featuring live wallets, countdown verification timers, MFS cashout engine, and automated micro-tasks.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

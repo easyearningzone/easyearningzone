@@ -1,0 +1,2236 @@
+import { createClient } from '@supabase/supabase-js';
+import { User, Wallet, Task, UserTask, Withdrawal, Transaction, MembershipLevel, MfsProvider, WithdrawalStatus, PlatformType, MarketplaceListing, AdminAccountSale, AdminBuyingRequirement, VerificationRequest, VerificationRequestStatus } from '../types';
+
+// Detect Supabase initialization variables
+const SUPABASE_URL = ((import.meta as any).env.VITE_SUPABASE_URL || 'https://apnzwgrupifhmifqbndu.supabase.co').trim().replace(/^["']|["']$/g, '');
+const SUPABASE_ANON_KEY = ((import.meta as any).env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_Diosdxt2gvWcbb07LGYzLg_j6DM7Txn').trim().replace(/^["']|["']$/g, '');
+
+export const isSupabaseConfigured = SUPABASE_URL !== '' && SUPABASE_ANON_KEY !== '';
+
+// Create actual Supabase client if available, else null
+export const supabase = isSupabaseConfigured ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+// Seed tasks data for fallback or initialization
+export const INITIAL_TASKS: Task[] = [
+  {
+    id: 'task-1',
+    title: 'Watch bKash App Transfer Tutorial',
+    description: 'Watch the full video tutorial on how to safely transfer mobile-money via bKash to avoid fraudulent phishing attempts.',
+    reward_bdt: 6.50,
+    duration_seconds: 15, // Made shorter for convenient testing, real is 30s
+    task_type: 'video',
+    external_url: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    category: 'Video Ad',
+    active: true,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'task-2',
+    title: 'Visit Nagad Cash Out Tariffs Guide',
+    description: 'Read our detailed information guide containing current Nagad smart cash out low tariff indices and limits.',
+    reward_bdt: 3.25,
+    duration_seconds: 10, // Shorter for testing, real is 15s
+    task_type: 'visit',
+    external_url: 'https://example.com/nagad-guide',
+    category: 'Sponsored Web',
+    active: true,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'task-3',
+    title: 'Follow Easy Earning BD Facebook',
+    description: 'Join/Follow our official community page handler for daily bonus codes, promotional codes and payouts update notifications.',
+    reward_bdt: 4.00,
+    duration_seconds: 8,
+    task_type: 'social',
+    external_url: 'https://facebook.com/easyearningbd',
+    category: 'Social Media',
+    active: true,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'task-4',
+    title: 'Discover Freelancing in Bangladesh',
+    description: 'Learn how microjob microtasks scale your regular supplemental income and build digital workspace portfolios in Bangladesh.',
+    reward_bdt: 8.50,
+    duration_seconds: 20, // Shorter for testing, real is 45s
+    task_type: 'visit',
+    external_url: 'https://example.com/freelancer-bd-blog',
+    category: 'Video Ad',
+    active: true,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'task-5',
+    title: 'Complete Financial Security Quiz',
+    description: 'Review crucial online mobile safety checks to protect your PIN codes from modern social-engineering schemes.',
+    reward_bdt: 12.00,
+    duration_seconds: 18,
+    task_type: 'quiz',
+    external_url: 'https://example.com/quiz-finance',
+    category: 'Interactive Quiz',
+    active: true,
+    created_at: new Date().toISOString()
+  },
+  {
+    id: 'task-6',
+    title: 'Join Rocket Wallet App Review',
+    description: 'Visit the Dutch-Bangla Bank Rocket platform updates sheet to leave structural developer review suggestions.',
+    reward_bdt: 5.50,
+    duration_seconds: 12,
+    task_type: 'visit',
+    external_url: 'https://example.com/rocket-wallet',
+    category: 'Sponsored Web',
+    active: true,
+    created_at: new Date().toISOString()
+  }
+];
+
+// Seed data for Marketplace fallback
+export const INITIAL_MARKETPLACE_LISTINGS: MarketplaceListing[] = [
+  {
+    id: 'list-1',
+    seller_id: 'user-demo-seller',
+    seller_username: 'Abir Chowdhury',
+    platform_type: 'gmail',
+    title: '5 Years Old Verified Gmail (Bangladesh IP)',
+    description: 'Clean aged Google Account created in 2021 with recovery setup, suitable for YouTube or Play store console listings.',
+    account_details: 'Email: abir2021@gmail.com | Password: SecretPass9921 | Recovery: rec_abir@yahoo.com',
+    price_bdt: 250.00,
+    status: 'available',
+    created_at: new Date(Date.now() - 3600000 * 5).toISOString()
+  },
+  {
+    id: 'list-2',
+    seller_id: 'user-demo-seller-2',
+    seller_username: 'Nabila Islam',
+    platform_type: 'fb',
+    title: 'Facebook Profile with 2,500+ BD Friends',
+    description: 'Created 2 years ago, active feed engagement, fully verified Bangladeshi mobile details (NID matched layout).',
+    account_details: 'User ID: nabila.island.bd | Pass: NabilaVibes8899 | Cookies provided on download',
+    price_bdt: 450.00,
+    status: 'available',
+    created_at: new Date(Date.now() - 3600000 * 12).toISOString()
+  },
+  {
+    id: 'list-3',
+    seller_id: 'user-demo-seller-3',
+    seller_username: 'Fahim Shakil',
+    platform_type: 'tiktok',
+    title: 'TikTok Account with 10k Followers (Tech Niche)',
+    description: 'Organic tech-review reels focus, no copyright strikes, highly motivated active local Bangladeshi viewers.',
+    account_details: 'Username: @shakiltech_bd | Pass: ShakilTiktokPro# | Connected Email: shakilpro@gmail.com',
+    price_bdt: 950.00,
+    status: 'available',
+    created_at: new Date(Date.now() - 3600000 * 24).toISOString()
+  },
+  {
+    id: 'list-4',
+    seller_id: 'user-demo-seller',
+    seller_username: 'Abir Chowdhury',
+    platform_type: 'whatsapp',
+    title: 'WhatsApp Business API Active Number',
+    description: 'Pre-warmed virtual number from safe BD communications layer, suitable for commercial automated chat integrations.',
+    account_details: 'Number: +8801987541254 | OTP Link: Sent on demand | Api secret: wh_api_sec_9918231',
+    price_bdt: 180.00,
+    status: 'available',
+    created_at: new Date(Date.now() - 3600000 * 48).toISOString()
+  }
+];
+
+// Helper to interact with LocalStorage
+const getStorageItem = <T>(key: string, defaultValue: T): T => {
+  try {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse(item) : defaultValue;
+  } catch (e) {
+    console.error(`Error reading key ${key} from localStorage`, e);
+    return defaultValue;
+  }
+};
+
+const setStorageItem = <T>(key: string, value: T): void => {
+  try {
+    window.localStorage.setItem(key, JSON.stringify(value));
+  } catch (e) {
+    console.error(`Error writing key ${key} to localStorage`, e);
+  }
+};
+
+// Local storage names block
+const USERS_KEY = 'eebd_users_v1';
+const WALLETS_KEY = 'eebd_wallets_v1';
+const WITHDRAWALS_KEY = 'eebd_withdrawals_v1';
+const COMPLETED_TASKS_KEY = 'eebd_user_tasks_v1';
+const TRANSACTIONS_KEY = 'eebd_transactions_v1';
+const TASKS_KEY = 'eebd_tasks_v1';
+const MARKETPLACE_KEY = 'eebd_marketplace_v1';
+
+// Initialize data if blank
+const initLocalStorage = () => {
+  if (!window.localStorage.getItem(TASKS_KEY)) {
+    setStorageItem(TASKS_KEY, INITIAL_TASKS);
+  }
+  if (!window.localStorage.getItem(MARKETPLACE_KEY)) {
+    setStorageItem(MARKETPLACE_KEY, INITIAL_MARKETPLACE_LISTINGS);
+  }
+};
+
+// Trigger verification
+initLocalStorage();
+
+// Standard cryptographic simulation for client password hashing matching DDL
+const simpleHashCode = (str: string): string => {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = (hash << 5) - hash + char;
+    hash |= 0; // Convert to 32bit integer
+  }
+  return 'hash_' + Math.abs(hash).toString(16);
+};
+
+export const apiService = {
+  // --- AUTH SERVICES ---
+  async register(phone: string, email: string, username: string, password_raw: string, referred_by_code?: string): Promise<{ success: boolean; user?: User; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // First verify uniqueness in mock users / local users to maintain full alignment
+        const { data: existEmail } = await supabase.from('users').select('id').eq('email', email).maybeSingle();
+        if (existEmail) return { success: false, error: 'Email already registered.' };
+        const { data: existPhone } = await supabase.from('users').select('id').eq('phone', phone).maybeSingle();
+        if (existPhone) return { success: false, error: 'Phone number already registered.' };
+
+        let parentCodeClean: string | null = null;
+        if (referred_by_code && referred_by_code.trim()) {
+          const { data: refUser } = await supabase.from('users').select('id').eq('referral_code', referred_by_code.trim()).maybeSingle();
+          if (!refUser) {
+            return { success: false, error: 'The Referral Code entered is invalid inside Easy Earning BD.' };
+          }
+          parentCodeClean = referred_by_code.trim();
+        }
+
+        const passHash = simpleHashCode(password_raw);
+        const refCode = 'EEBD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        
+        const userObj = {
+          phone,
+          email,
+          username,
+          password_hash: passHash,
+          membership_level: 'Free' as MembershipLevel,
+          referral_code: refCode,
+          referred_by_code: parentCodeClean,
+          is_verified: false
+        };
+
+        const { data, error } = await supabase.from('users').insert([userObj]).select().single();
+        if (error) throw error;
+
+        // Wallet is auto-created by database trigger 'on_user_created'
+
+        return { success: true, user: data as User };
+      } catch (err: any) {
+        console.error('Supabase registration error:', err);
+        return { success: false, error: err.message || 'Supabase operation failed.' };
+      }
+    } else {
+      // Local storage implementation
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      if (users.find(u => u.email.toLowerCase() === email.toLowerCase())) {
+        return { success: false, error: 'Email already registered.' };
+      }
+      if (users.find(u => u.phone === phone)) {
+        return { success: false, error: 'Phone number already registered.' };
+      }
+
+      let parentCodeClean: string | null = null;
+      if (referred_by_code && referred_by_code.trim()) {
+        const referralExists = users.some(u => u.referral_code === referred_by_code.trim());
+        if (!referralExists) {
+          return { success: false, error: 'The Referral Code entered is invalid inside Easy Earning BD.' };
+        }
+        parentCodeClean = referred_by_code.trim();
+      }
+
+      const refCode = 'EEBD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+
+      const newUser: User = {
+        id: 'user-' + Math.random().toString(36).substr(2, 9),
+        phone,
+        email,
+        username,
+        membership_level: 'Free',
+        password_hash: simpleHashCode(password_raw),
+        referral_code: refCode,
+        referred_by_code: parentCodeClean,
+        is_verified: false,
+        created_at: new Date().toISOString()
+      };
+
+      users.push(newUser);
+      setStorageItem(USERS_KEY, users);
+
+      // Create associate wallet
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const newWallet: Wallet = {
+        id: 'wallet-' + Math.random().toString(36).substr(2, 9),
+        user_id: newUser.id,
+        balance_bdt: 50.00, // Initial seed bonus for Bangladeshi users to start testing!
+        total_earned_bdt: 50.00,
+        total_withdrawn_bdt: 0.00,
+        updated_at: new Date().toISOString()
+      };
+      wallets.push(newWallet);
+      setStorageItem(WALLETS_KEY, wallets);
+
+      // Log starter transaction
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-seed-' + Math.random().toString(36).substr(2, 9),
+        user_id: newUser.id,
+        type: 'Reward',
+        amount: 50.00,
+        description: 'New User Registration Greeting Bonus (Promo 50 BDT)',
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+
+      return { success: true, user: newUser };
+    }
+  },
+
+  async login(phoneOrEmail: string, password_raw: string): Promise<{ success: boolean; user?: User; error?: string }> {
+    const inputHash = simpleHashCode(password_raw);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const isEmail = phoneOrEmail.includes('@');
+        const query = isEmail 
+          ? supabase.from('users').select('*').eq('email', phoneOrEmail)
+          : supabase.from('users').select('*').eq('phone', phoneOrEmail);
+
+        const { data, error } = await query.maybeSingle();
+
+        if (error) throw error;
+        if (!data) return { success: false, error: 'User account not found.' };
+
+        if (data.password_hash !== inputHash) {
+          return { success: false, error: 'Incorrect phone/email or password.' };
+        }
+
+        // Defensive code to guarantee referral credentials exist
+        if (!data.referral_code) {
+          const refCode = 'EEBD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+          const { data: updatedUser } = await supabase.from('users').update({ referral_code: refCode }).eq('id', data.id).select().single();
+          return { success: true, user: (updatedUser || data) as User };
+        }
+
+        return { success: true, user: data as User };
+      } catch (err: any) {
+        console.error('Supabase login error:', err);
+        return { success: false, error: err.message || 'Supabase login failed.' };
+      }
+    } else {
+      // Local storage fallback
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      const matchedIdx = users.findIndex(
+        u => u.email.toLowerCase() === phoneOrEmail.toLowerCase() || u.phone === phoneOrEmail
+      );
+
+      if (matchedIdx === -1) {
+        return { success: false, error: 'User account not found.' };
+      }
+
+      const matched = users[matchedIdx];
+
+      if (matched.password_hash !== inputHash) {
+        return { success: false, error: 'Incorrect phone/email or password.' };
+      }
+
+      // Safeguard LocalStorage fields
+      let updatedUserObj = { ...matched };
+      let updatedNeeded = false;
+      if (!updatedUserObj.referral_code) {
+        updatedUserObj.referral_code = 'EEBD-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+        updatedNeeded = true;
+      }
+      if (updatedUserObj.is_verified === undefined) {
+        updatedUserObj.is_verified = false;
+        updatedNeeded = true;
+      }
+      if (updatedUserObj.referred_by_code === undefined) {
+        updatedUserObj.referred_by_code = null;
+        updatedNeeded = true;
+      }
+
+      if (updatedNeeded) {
+        users[matchedIdx] = updatedUserObj;
+        setStorageItem(USERS_KEY, users);
+      }
+
+      return { success: true, user: updatedUserObj };
+    }
+  },
+
+  // --- USER TIERS & PROFILE ---
+  async getUserProfile(userId: string): Promise<User | null> {
+    if (isSupabaseConfigured && supabase) {
+      const { data } = await supabase.from('users').select('*').eq('id', userId).maybeSingle();
+      return data as User | null;
+    } else {
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      return users.find(u => u.id === userId) || null;
+    }
+  },
+
+  async updateUserProfile(userId: string, updates: { full_name?: string; avatar_url?: string }): Promise<{ success: boolean; user?: User; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('users')
+          .update(updates)
+          .eq('id', userId)
+          .select()
+          .single();
+        if (error) throw error;
+        return { success: true, user: data as User };
+      } catch (err: any) {
+        console.error('Error updating user profile in Supabase:', err);
+        return { success: false, error: err.message };
+      }
+    } else {
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      const userIdx = users.findIndex(u => u.id === userId);
+      if (userIdx === -1) return { success: false, error: 'User profile not found.' };
+
+      const updatedUser = {
+        ...users[userIdx],
+        ...updates
+      };
+      users[userIdx] = updatedUser;
+      setStorageItem(USERS_KEY, users);
+      
+      // Dispatch custom event to notify update
+      window.dispatchEvent(new CustomEvent('eebd_users_updated'));
+      
+      return { success: true, user: updatedUser };
+    }
+  },
+
+  async getLeaderDetails(referredByCode: string): Promise<User | null> {
+    const code = referredByCode?.trim();
+    if (!code) return null;
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data } = await supabase
+          .from('users')
+          .select('*')
+          .eq('referral_code', code)
+          .maybeSingle();
+        return data as User | null;
+      } catch (err) {
+        console.error('Error fetching leader details:', err);
+        return null;
+      }
+    } else {
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      return users.find(u => u.referral_code === code) || null;
+    }
+  },
+
+  // --- WALLET SERVICE ---
+  async getWallet(userId: string): Promise<Wallet | null> {
+    if (isSupabaseConfigured && supabase) {
+      const { data } = await supabase.from('wallets').select('*').eq('user_id', userId).maybeSingle();
+      return data as Wallet | null;
+    } else {
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      let wallet = wallets.find(w => w.user_id === userId);
+      
+      // If none found (safeguard)
+      if (!wallet) {
+        wallet = {
+          id: 'wallet-' + Math.random().toString(36).substr(2, 9),
+          user_id: userId,
+          balance_bdt: 0.00,
+          total_earned_bdt: 0.00,
+          total_withdrawn_bdt: 0.00,
+          updated_at: new Date().toISOString()
+        };
+        wallets.push(wallet);
+        setStorageItem(WALLETS_KEY, wallets);
+      }
+      return wallet ?? null;
+    }
+  },
+
+  // --- TASK MANAGEMENT ---
+  async getTasks(userId: string): Promise<{ tasks: Task[]; completedTaskIds: string[] }> {
+    let tasks: Task[] = [];
+    let completedTaskIds: string[] = [];
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: tasksData } = await supabase.from('tasks').select('*').eq('active', true);
+        const { data: userTasksData } = await supabase.from('user_tasks').select('task_id').eq('user_id', userId);
+        
+        tasks = (tasksData as Task[]) || [];
+        completedTaskIds = (userTasksData as { task_id: string }[] || []).map(ut => ut.task_id);
+      } catch (err) {
+        console.error('Supabase load tasks error, loading seed tasks:', err);
+        tasks = INITIAL_TASKS;
+      }
+    } else {
+      tasks = getStorageItem<Task[]>(TASKS_KEY, INITIAL_TASKS);
+      const userTasks = getStorageItem<UserTask[]>(COMPLETED_TASKS_KEY, []);
+      completedTaskIds = userTasks.filter(ut => ut.user_id === userId).map(ut => ut.task_id);
+    }
+
+    return { tasks, completedTaskIds };
+  },
+
+  async awardDirectBonus(userId: string, amount: number, description: string): Promise<{ success: boolean; wallet?: Wallet; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // Fetch user wallet
+        const { data: wData, error: wErr } = await supabase.from('wallets').select('*').eq('user_id', userId).single();
+        if (wErr) throw wErr;
+
+        const currentWallet = wData as Wallet;
+
+        // Perform transactional update
+        const updatedWallet = {
+          balance_bdt: Number(currentWallet.balance_bdt) + Number(amount),
+          total_earned_bdt: Number(currentWallet.total_earned_bdt) + Number(amount),
+          updated_at: new Date().toISOString()
+        };
+
+        const { data: newWallet, error: updateErr } = await supabase
+          .from('wallets')
+          .update(updatedWallet)
+          .eq('id', currentWallet.id)
+          .select()
+          .single();
+
+        if (updateErr) throw updateErr;
+
+        // Append to transaction ledger
+        await supabase.from('transactions').insert([{
+          user_id: userId,
+          type: 'Reward',
+          amount: amount,
+          description: description
+        }]);
+
+        return { success: true, wallet: newWallet as Wallet };
+      } catch (err: any) {
+        console.error('Supabase direct award failed:', err);
+        return { success: false, error: err.message || 'Database execution fault.' };
+      }
+    } else {
+      // Local storage engine trigger
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(w => w.user_id === userId);
+
+      if (walletIdx === -1) {
+        return { success: false, error: 'Wallet profile does not exist.' };
+      }
+
+      const activeWallet = wallets[walletIdx];
+      const updated: Wallet = {
+        ...activeWallet,
+        balance_bdt: Number((Number(activeWallet.balance_bdt) + Number(amount)).toFixed(2)),
+        total_earned_bdt: Number((Number(activeWallet.total_earned_bdt) + Number(amount)).toFixed(2)),
+        updated_at: new Date().toISOString()
+      };
+      
+      wallets[walletIdx] = updated;
+      setStorageItem(WALLETS_KEY, wallets);
+
+      // Append transaction
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        type: 'Reward',
+        amount: Number(amount),
+        description: description,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+
+      return { success: true, wallet: updated };
+    }
+  },
+
+  async completeTask(userId: string, taskId: string, reward: number): Promise<{ success: boolean; wallet?: Wallet; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // Double-spending prevention: check database for existing completion
+        const { data: existing } = await supabase
+          .from('user_tasks')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('task_id', taskId)
+          .maybeSingle();
+
+        if (existing) {
+          return { success: false, error: 'Task already completed by this account!' };
+        }
+
+        // Insert task confirmation
+        const { error: taskErr } = await supabase.from('user_tasks').insert([{
+          user_id: userId,
+          task_id: taskId,
+          reward_earned: reward
+        }]);
+
+        if (taskErr) throw taskErr;
+
+        // Fetch user wallet
+        const { data: wData, error: wErr } = await supabase.from('wallets').select('*').eq('user_id', userId).single();
+        if (wErr) throw wErr;
+
+        const currentWallet = wData as Wallet;
+
+        // Perform transactional update
+        const updatedWallet = {
+          balance_bdt: Number(currentWallet.balance_bdt) + Number(reward),
+          total_earned_bdt: Number(currentWallet.total_earned_bdt) + Number(reward),
+          updated_at: new Date().toISOString()
+        };
+
+        const { data: newWallet, error: updateErr } = await supabase
+          .from('wallets')
+          .update(updatedWallet)
+          .eq('id', currentWallet.id)
+          .select()
+          .single();
+
+        if (updateErr) throw updateErr;
+
+        // Append to transaction ledger
+        const { data: taskDetail } = await supabase.from('tasks').select('title').eq('id', taskId).maybeSingle();
+        const taskTitle = taskDetail?.title || 'Microjob Task';
+
+        await supabase.from('transactions').insert([{
+          user_id: userId,
+          type: 'Reward',
+          amount: reward,
+          description: `Credited for completed task: "${taskTitle}"`
+        }]);
+
+        return { success: true, wallet: newWallet as Wallet };
+      } catch (err: any) {
+        console.error('Supabase task completion transaction failed:', err);
+        return { success: false, error: err.message || 'Database execution fault.' };
+      }
+    } else {
+      // Local storage engine trigger
+      const userTasks = getStorageItem<UserTask[]>(COMPLETED_TASKS_KEY, []);
+      const alreadyDone = userTasks.some(ut => ut.user_id === userId && ut.task_id === taskId);
+      if (alreadyDone) {
+        return { success: false, error: 'Task already completed by this account!' };
+      }
+
+      // Record task completion
+      const newCompletion: UserTask = {
+        id: 'ut-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        task_id: taskId,
+        completed_at: new Date().toISOString(),
+        reward_earned: reward
+      };
+      userTasks.push(newCompletion);
+      setStorageItem(COMPLETED_TASKS_KEY, userTasks);
+
+      // Adjust wallet details
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(w => w.user_id === userId);
+
+      if (walletIdx === -1) {
+        return { success: false, error: 'Wallet profile does not exist.' };
+      }
+
+      const activeWallet = wallets[walletIdx];
+      const updated: Wallet = {
+        ...activeWallet,
+        balance_bdt: Number((Number(activeWallet.balance_bdt) + Number(reward)).toFixed(2)),
+        total_earned_bdt: Number((Number(activeWallet.total_earned_bdt) + Number(reward)).toFixed(2)),
+        updated_at: new Date().toISOString()
+      };
+      
+      wallets[walletIdx] = updated;
+      setStorageItem(WALLETS_KEY, wallets);
+
+      // Append transaction
+      const tasks = getStorageItem<Task[]>(TASKS_KEY, INITIAL_TASKS);
+      const matchedTask = tasks.find(t => t.id === taskId);
+      const taskTitle = matchedTask ? matchedTask.title : 'Microjob Task';
+
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        type: 'Reward',
+        amount: reward,
+        description: `Credited for completing task: "${taskTitle}"`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+
+      return { success: true, wallet: updated };
+    }
+  },
+
+  // --- WITHDRAWALS & CASHOUT ENGINE ---
+  async requestWithdrawal(
+    userId: string,
+    amount: number,
+    mfsProvider: MfsProvider,
+    accountNumber: string
+  ): Promise<{ success: boolean; wallet?: Wallet; withdrawal?: Withdrawal; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // Retrieve Wallet balance first
+        const { data: wData, error: wErr } = await supabase.from('wallets').select('*').eq('user_id', userId).single();
+        if (wErr) throw wErr;
+
+        const currentWallet = wData as Wallet;
+        if (Number(currentWallet.balance_bdt) < amount) {
+          return { success: false, error: 'Insufficient wallet balance for withdrawal.' };
+        }
+
+        // Deduct bdt amount
+        const updatedWallet = {
+          balance_bdt: Number(currentWallet.balance_bdt) - Number(amount),
+          total_withdrawn_bdt: Number(currentWallet.total_withdrawn_bdt) + Number(amount),
+          updated_at: new Date().toISOString()
+        };
+
+        const { data: walletNew, error: updateErr } = await supabase
+          .from('wallets')
+          .update(updatedWallet)
+          .eq('id', currentWallet.id)
+          .select()
+          .single();
+
+        if (updateErr) throw updateErr;
+
+        // Put withdrawal transaction
+        const withdrawalInsert = {
+          user_id: userId,
+          amount_bdt: amount,
+          mfs_provider: mfsProvider,
+          account_number: accountNumber,
+          status: 'Pending' as WithdrawalStatus
+        };
+
+        const { data: withdrawalCreated, error: withErr } = await supabase
+          .from('withdrawals')
+          .insert([withdrawalInsert])
+          .select()
+          .single();
+
+        if (withErr) throw withErr;
+
+        // Enter transaction log
+        await supabase.from('transactions').insert([{
+          user_id: userId,
+          type: 'Withdrawal_Pending',
+          amount: amount,
+          description: `Requested cashout of BDT ${amount.toFixed(2)} to ${mfsProvider} (${accountNumber})`
+        }]);
+
+        return {
+          success: true,
+          wallet: walletNew as Wallet,
+          withdrawal: withdrawalCreated as Withdrawal
+        };
+      } catch (err: any) {
+        console.error('Supabase cashout exception:', err);
+        return { success: false, error: err.message || 'Withdrawal validation failed.' };
+      }
+    } else {
+      // Local storages
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(w => w.user_id === userId);
+
+      if (walletIdx === -1) {
+        return { success: false, error: 'Wallet profile does not exist.' };
+      }
+
+      const activeWallet = wallets[walletIdx];
+      if (Number(activeWallet.balance_bdt) < amount) {
+        return { success: false, error: 'Insufficient wallet balance for withdrawal.' };
+      }
+
+      // Update wallet balance
+      const updatedWallet: Wallet = {
+        ...activeWallet,
+        balance_bdt: Number((Number(activeWallet.balance_bdt) - amount).toFixed(2)),
+        total_withdrawn_bdt: Number((Number(activeWallet.total_withdrawn_bdt) + amount).toFixed(2)),
+        updated_at: new Date().toISOString()
+      };
+      wallets[walletIdx] = updatedWallet;
+      setStorageItem(WALLETS_KEY, wallets);
+
+      // Create withdrawal item
+      const withdrawals = getStorageItem<Withdrawal[]>(WITHDRAWALS_KEY, []);
+      const newWithdrawal: Withdrawal = {
+        id: 'with-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        amount_bdt: amount,
+        mfs_provider: mfsProvider,
+        account_number: accountNumber,
+        status: 'Pending',
+        created_at: new Date().toISOString(),
+        reference_id: 'EEBD-' + Math.random().toString(36).substr(2, 8).toUpperCase()
+      };
+      withdrawals.push(newWithdrawal);
+      setStorageItem(WITHDRAWALS_KEY, withdrawals);
+
+      // Append ledger transaction
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        type: 'Withdrawal_Pending',
+        amount: amount,
+        description: `Requested cashout of BDT ${amount.toFixed(2)} to ${mfsProvider} (${accountNumber})`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+
+      return {
+        success: true,
+        wallet: updatedWallet,
+        withdrawal: newWithdrawal
+      };
+    }
+  },
+
+  async getWithdrawals(userId: string): Promise<Withdrawal[]> {
+    if (isSupabaseConfigured && supabase) {
+      const { data } = await supabase
+        .from('withdrawals')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      return (data as Withdrawal[]) || [];
+    } else {
+      const withdrawals = getStorageItem<Withdrawal[]>(WITHDRAWALS_KEY, []);
+      return withdrawals
+        .filter(w => w.user_id === userId)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+  },
+
+  // --- MEMBERSHIP UPGRADE SERVICE ---
+  async upgradeMembership(userId: string, level: MembershipLevel, fee: number): Promise<{ success: boolean; user?: User; wallet?: Wallet; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // Fetch current wallet details
+        const { data: walletData, error: walletErr } = await supabase.from('wallets').select('*').eq('user_id', userId).single();
+        if (walletErr) throw walletErr;
+
+        const currentWallet = walletData as Wallet;
+        if (Number(currentWallet.balance_bdt) < fee && fee > 0) {
+          return { success: false, error: `Inadequate balance. Membership upgrade requires BDT ${fee.toFixed(2)} Taka.` };
+        }
+
+        // Deduct upgrade cost
+        const updatedWallet = {
+          balance_bdt: Number(currentWallet.balance_bdt) - Number(fee),
+          updated_at: new Date().toISOString()
+        };
+
+        const { data: finalWallet, error: updateWErr } = await supabase
+          .from('wallets')
+          .update(updatedWallet)
+          .eq('id', currentWallet.id)
+          .select()
+          .single();
+
+        if (updateWErr) throw updateWErr;
+
+        // Update user tier
+        const { data: finalUser, error: updateUErr } = await supabase
+          .from('users')
+          .update({ membership_level: level })
+          .eq('id', userId)
+          .select()
+          .single();
+
+        if (updateUErr) throw updateUErr;
+
+        // Transaction note
+        await supabase.from('transactions').insert([{
+          user_id: userId,
+          type: 'Membership_Upgrade',
+          amount: fee,
+          description: `Upgraded Membership account type to "${level} VIP" status tier`
+        }]);
+
+        return { success: true, user: finalUser as User, wallet: finalWallet as Wallet };
+      } catch (err: any) {
+        console.error('Membership level upgrade failed:', err);
+        return { success: false, error: err.message || 'Operation halted.' };
+      }
+    } else {
+      // Local storage upgrade routine
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(w => w.user_id === userId);
+      if (walletIdx === -1) return { success: false, error: 'Database wallet state is corrupt.' };
+
+      const activeWallet = wallets[walletIdx];
+      if (Number(activeWallet.balance_bdt) < fee && fee > 0) {
+        return { success: false, error: `Inadequate balance. Upgrade fee is BDT ${fee.toFixed(2)}.` };
+      }
+
+      // Modify wallet
+      const nextWallet: Wallet = {
+        ...activeWallet,
+        balance_bdt: Number((Number(activeWallet.balance_bdt) - fee).toFixed(2)),
+        updated_at: new Date().toISOString()
+      };
+      wallets[walletIdx] = nextWallet;
+      setStorageItem(WALLETS_KEY, wallets);
+
+      // Modify user profile
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      const userIdx = users.findIndex(u => u.id === userId);
+      if (userIdx === -1) return { success: false, error: 'User profiles registry missing.' };
+
+      const activeUser = users[userIdx];
+      const nextUser: User = {
+        ...activeUser,
+        membership_level: level
+      };
+      users[userIdx] = nextUser;
+      setStorageItem(USERS_KEY, users);
+
+      // Log transaction
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-upgrade-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        type: 'Membership_Upgrade',
+        amount: fee,
+        description: `Upgraded account tier to premium "${level}" vip status.`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+
+      return { success: true, user: nextUser, wallet: nextWallet };
+    }
+  },
+
+  // --- LEDGER SERVICES ---
+  async getTransactions(userId: string): Promise<Transaction[]> {
+    if (isSupabaseConfigured && supabase) {
+      const { data } = await supabase
+        .from('transactions')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false });
+      return (data as Transaction[]) || [];
+    } else {
+      const txs = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      return txs
+        .filter(t => t.user_id === userId)
+        .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+    }
+  },
+
+  // --- MLM REFERRAL VERIFICATION SYSTEM ---
+  async payVerificationFee(userId: string, payWithWallet: boolean, mfsDetails?: { provider: MFSKeyType; accountNo: string }): Promise<{ success: boolean; user?: User; wallet?: Wallet; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // Fetch user profile first
+        const { data: userData, error: uErr } = await supabase.from('users').select('*').eq('id', userId).single();
+        if (uErr) throw uErr;
+        const activeUser = userData as User;
+
+        if (activeUser.is_verified) {
+          return { success: false, error: 'Account is already verified!' };
+        }
+
+        let updatedWallet: Wallet | null = null;
+
+        if (payWithWallet) {
+          // Fetch wallet balance
+          const { data: wData, error: wErr } = await supabase.from('wallets').select('*').eq('user_id', userId).single();
+          if (wErr) throw wErr;
+          const currentWallet = wData as Wallet;
+
+          if (Number(currentWallet.balance_bdt) < 100) {
+            return { success: false, error: 'Insufficient balance. Active Verification demands 100 BDT.' };
+          }
+
+          // Deduct 100 BDT
+          const { data: newWData, error: updateWErr } = await supabase
+            .from('wallets')
+            .update({
+              balance_bdt: Number(currentWallet.balance_bdt) - 100,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', currentWallet.id)
+            .select()
+            .single();
+
+          if (updateWErr) throw updateWErr;
+          updatedWallet = newWData as Wallet;
+
+          // Record payment transaction
+          await supabase.from('transactions').insert([{
+            user_id: userId,
+            type: 'Verification_Fee_Paid',
+            amount: 100.00,
+            description: 'Paid activation charge of 100 BDT Taka via Wallet Balance'
+          }]);
+        } else {
+          // User pays with MFS immediately
+          if (!mfsDetails || !mfsDetails.accountNo) {
+            return { success: false, error: 'Please set up mobile banking transfer properties.' };
+          }
+
+          // In Supabase mode, log standard transaction representing MFS verify payment
+          await supabase.from('transactions').insert([{
+            user_id: userId,
+            type: 'Verification_Fee_Paid',
+            amount: 100.00,
+            description: `Paid activation charge of 100 BDT via ${mfsDetails.provider} Mobile Wallet (${mfsDetails.accountNo})`
+          }]);
+
+          // Wallet is not deducted as money comes from external MFS transfer!
+          const { data: wData } = await supabase.from('wallets').select('*').eq('user_id', userId).maybeSingle();
+          if (wData) updatedWallet = wData as Wallet;
+        }
+
+        // Set user verified status
+        const { data: finalUser, error: updateUErr } = await supabase
+          .from('users')
+          .update({ is_verified: true })
+          .eq('id', userId)
+          .select()
+          .single();
+
+        if (updateUErr) throw updateUErr;
+
+        // TRIGGER THE RECURSIVE 10-GENERATION MLM COMMISSIONS SYSTEM UPWARDS!
+        if (finalUser.referred_by_code) {
+          await distributeCommissionsRecursivelySupabase(finalUser.referred_by_code, 1);
+        }
+
+        return { success: true, user: finalUser as User, wallet: updatedWallet || undefined };
+      } catch (err: any) {
+        console.error('Supabase payVerificationFee error:', err);
+        return { success: false, error: err.message || 'Database error occurred during validation.' };
+      }
+    } else {
+      // Local storage implementation
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      const userIdx = users.findIndex(u => u.id === userId);
+      if (userIdx === -1) return { success: false, error: 'User does not exist.' };
+
+      const activeUser = users[userIdx];
+      if (activeUser.is_verified) {
+        return { success: false, error: 'Account is already verified!' };
+      }
+
+      let activeWallet: Wallet | null = null;
+
+      if (payWithWallet) {
+        const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+        const wIdx = wallets.findIndex(w => w.user_id === userId);
+        if (wIdx === -1) return { success: false, error: 'Wallet not found.' };
+
+        const currentWallet = wallets[wIdx];
+        if (Number(currentWallet.balance_bdt) < 100) {
+          return { success: false, error: 'Insufficient balance. Active Verification demands 100 BDT.' };
+        }
+
+        // Deduct 100 Taka
+        currentWallet.balance_bdt = Number((Number(currentWallet.balance_bdt) - 100).toFixed(2));
+        currentWallet.updated_at = new Date().toISOString();
+        wallets[wIdx] = currentWallet;
+        setStorageItem(WALLETS_KEY, wallets);
+        activeWallet = currentWallet;
+
+        // Log transaction
+        const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+        transactions.push({
+          id: 'tx-vfee-' + Math.random().toString(36).substr(2, 9),
+          user_id: userId,
+          type: 'Verification_Fee_Paid',
+          amount: 100.00,
+          description: 'Paid activation charge of 100 BDT Taka via Wallet Balance',
+          created_at: new Date().toISOString()
+        });
+        setStorageItem(TRANSACTIONS_KEY, transactions);
+      } else {
+        // paid with external wallet
+        if (!mfsDetails || !mfsDetails.accountNo) {
+          return { success: false, error: 'Please provide working mobile wallet parameters.' };
+        }
+
+        // Mock external wallet transaction
+        const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+        transactions.push({
+          id: 'tx-vfee-ext-' + Math.random().toString(36).substr(2, 9),
+          user_id: userId,
+          type: 'Verification_Fee_Paid',
+          amount: 100.00,
+          description: `Paid activation charge of 100 BDT via external ${mfsDetails.provider} Mobile Wallet (${mfsDetails.accountNo})`,
+          created_at: new Date().toISOString()
+        });
+        setStorageItem(TRANSACTIONS_KEY, transactions);
+
+        const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+        activeWallet = wallets.find(w => w.user_id === userId) || null;
+      }
+
+      // Verify user
+      activeUser.is_verified = true;
+      users[userIdx] = activeUser;
+      setStorageItem(USERS_KEY, users);
+
+      // TRIGGER THE RECURSIVE MLM TREE DISTRIBUTION INSTANTLY!
+      if (activeUser.referred_by_code) {
+        distributeCommissionsRecursivelyLocal(activeUser.referred_by_code, 1);
+      }
+
+      return { success: true, user: activeUser, wallet: activeWallet || undefined };
+    }
+  },
+
+  // --- VERIFICATION REQUEST SERVICES ---
+  async getVerificationRequestsByUser(userId: string): Promise<VerificationRequest[]> {
+    const REQUESTS_KEY = 'eebd_verification_requests_v1';
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('verification_requests')
+          .select('*')
+          .eq('user_id', userId)
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data as VerificationRequest[];
+      } catch (err) {
+        console.error('Supabase fetch user verification requests error, falling back locally:', err);
+      }
+    }
+    const reqs = getStorageItem<VerificationRequest[]>(REQUESTS_KEY, []);
+    return reqs.filter(r => r.user_id === userId);
+  },
+
+  async getAllVerificationRequests(): Promise<VerificationRequest[]> {
+    const REQUESTS_KEY = 'eebd_verification_requests_v1';
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase
+          .from('verification_requests')
+          .select('*')
+          .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data as VerificationRequest[];
+      } catch (err) {
+        console.error('Supabase fetch all verification requests error, falling back locally:', err);
+      }
+    }
+    return getStorageItem<VerificationRequest[]>(REQUESTS_KEY, []);
+  },
+
+  async submitVerificationRequest(
+    userId: string,
+    username: string,
+    phone: string,
+    mfsProvider: MfsProvider,
+    senderNumber: string,
+    trxId: string,
+    amount: number
+  ): Promise<{ success: boolean; request?: VerificationRequest; error?: string }> {
+    const REQUESTS_KEY = 'eebd_verification_requests_v1';
+    
+    // Check if there is already a Pending request
+    const existing = await this.getVerificationRequestsByUser(userId);
+    const hasPending = existing.some(r => r.status === 'Pending' || r.status === 'Processing');
+    if (hasPending) {
+      return { success: false, error: 'আপনার একটি ভেরিফিকেশন আবেদন পেন্ডিং/প্রসেসিং অবস্থায় রয়েছে। অনুগ্রহ করে এডমিন রিভিউর জন্য অপেক্ষা করুন।' };
+    }
+
+    const newReq: VerificationRequest = {
+      id: 'verifreq-' + Math.random().toString(36).substr(2, 9),
+      user_id: userId,
+      username,
+      phone,
+      mfs_provider: mfsProvider,
+      sender_number: senderNumber,
+      trx_id: trxId,
+      amount,
+      status: 'Pending',
+      created_at: new Date().toISOString()
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('verification_requests').insert([newReq]).select().single();
+        if (error) throw error;
+        return { success: true, request: data as VerificationRequest };
+      } catch (err: any) {
+        console.error('Supabase create verification request error, falling back locally:', err);
+      }
+    }
+
+    const reqs = getStorageItem<VerificationRequest[]>(REQUESTS_KEY, []);
+    reqs.push(newReq);
+    setStorageItem(REQUESTS_KEY, reqs);
+
+    // Dispatch event to refresh UI
+    window.dispatchEvent(new CustomEvent('eebd_verification_requests_updated'));
+
+    return { success: true, request: newReq };
+  },
+
+  async updateVerificationRequestStatusByAdmin(
+    requestId: string,
+    status: VerificationRequestStatus,
+    adminNotes: string
+  ): Promise<{ success: boolean; error?: string }> {
+    const REQUESTS_KEY = 'eebd_verification_requests_v1';
+    
+    const reqs = getStorageItem<VerificationRequest[]>(REQUESTS_KEY, []);
+    const idx = reqs.findIndex(r => r.id === requestId);
+    if (idx === -1) {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          const { data: requestData, error: fetchErr } = await supabase.from('verification_requests').select('*').eq('id', requestId).single();
+          if (fetchErr) throw fetchErr;
+
+          const reqObj = requestData as VerificationRequest;
+          const prevStatus = reqObj.status;
+
+          const { data, error } = await supabase
+            .from('verification_requests')
+            .update({ status, admin_notes: adminNotes })
+            .eq('id', requestId)
+            .select()
+            .single();
+          if (error) throw error;
+
+          if (status === 'Approved' && prevStatus !== 'Approved') {
+            await supabase.from('users').update({ is_verified: true }).eq('id', reqObj.user_id);
+            const { data: userData } = await supabase.from('users').select('*').eq('id', reqObj.user_id).single();
+            if (userData && userData.referred_by_code) {
+              await distributeCommissionsRecursivelySupabase(userData.referred_by_code, 1);
+            }
+
+            await supabase.from('transactions').insert([{
+              user_id: reqObj.user_id,
+              type: 'Verification_Fee_Paid',
+              amount: reqObj.amount,
+              description: `Paid activation charge of ${reqObj.amount} BDT via ${reqObj.mfs_provider} Mobile Wallet (${reqObj.sender_number}) Approved by Admin`
+            }]);
+          }
+
+          return { success: true };
+        } catch (err: any) {
+          console.error('Supabase update verification status error:', err);
+          return { success: false, error: err.message };
+        }
+      }
+      return { success: false, error: 'ভেরিফিকেশন আবেদনটি খুঁজে পাওয়া যায়নি।' };
+    }
+
+    const reqObj = reqs[idx];
+    const prevStatus = reqObj.status;
+    reqObj.status = status;
+    reqObj.admin_notes = adminNotes;
+    reqs[idx] = reqObj;
+    setStorageItem(REQUESTS_KEY, reqs);
+
+    if (status === 'Approved' && prevStatus !== 'Approved') {
+      const users = getStorageItem<User[]>(USERS_KEY, []);
+      const uIdx = users.findIndex(u => u.id === reqObj.user_id);
+      if (uIdx !== -1) {
+        users[uIdx].is_verified = true;
+        setStorageItem(USERS_KEY, users);
+        
+        if (users[uIdx].referred_by_code) {
+          distributeCommissionsRecursivelyLocal(users[uIdx].referred_by_code, 1);
+        }
+      }
+
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-vfee-approved-' + Math.random().toString(36).substr(2, 9),
+        user_id: reqObj.user_id,
+        type: 'Verification_Fee_Paid',
+        amount: reqObj.amount,
+        description: `Activation charge of ${reqObj.amount} BDT via ${reqObj.mfs_provider} (${reqObj.sender_number}) approved by Admin`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: requestData } = await supabase.from('verification_requests').select('*').eq('id', requestId).maybeSingle();
+        if (requestData) {
+          const reqObjFromSupa = requestData as VerificationRequest;
+          const prevStatusFromSupa = reqObjFromSupa.status;
+
+          await supabase.from('verification_requests').update({ status, admin_notes: adminNotes }).eq('id', requestId);
+          if (status === 'Approved' && prevStatusFromSupa !== 'Approved') {
+            await supabase.from('users').update({ is_verified: true }).eq('id', reqObj.user_id);
+            const { data: userData } = await supabase.from('users').select('*').eq('id', reqObj.user_id).single();
+            if (userData && userData.referred_by_code) {
+              await distributeCommissionsRecursivelySupabase(userData.referred_by_code, 1);
+            }
+            await supabase.from('transactions').insert([{
+              user_id: reqObj.user_id,
+              type: 'Verification_Fee_Paid',
+              amount: reqObj.amount,
+              description: `Paid activation charge of ${reqObj.amount} BDT via ${reqObj.mfs_provider} Mobile Wallet (${reqObj.sender_number}) Approved by Admin`
+            }]);
+          }
+        }
+      } catch (err) {
+        console.error('Syncing supabase error during admin verification approval:', err);
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('eebd_verification_requests_updated'));
+
+    return { success: true };
+  },
+
+  // --- ACCOUNT MARKETPLACE SERVICES ---
+  async getMarketplaceListings(): Promise<MarketplaceListing[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data } = await supabase
+          .from('marketplace_listings')
+          .select('*')
+          .order('created_at', { ascending: false });
+        return (data as MarketplaceListing[]) || [];
+      } catch (err) {
+        console.error('Supabase marketplace_listings read failure, using local:', err);
+        return getStorageItem<MarketplaceListing[]>(MARKETPLACE_KEY, INITIAL_MARKETPLACE_LISTINGS);
+      }
+    } else {
+      return getStorageItem<MarketplaceListing[]>(MARKETPLACE_KEY, INITIAL_MARKETPLACE_LISTINGS);
+    }
+  },
+
+  async createMarketplaceListing(userId: string, sellerUsername: string, platformType: PlatformType, title: string, description: string, accountDetails: string, priceBdt: number): Promise<{ success: boolean; listing?: MarketplaceListing; error?: string }> {
+    const freshListing: any = {
+      seller_id: userId,
+      seller_username: sellerUsername,
+      platform_type: platformType,
+      title,
+      description,
+      account_details: accountDetails,
+      price_bdt: priceBdt,
+      status: 'available' as const,
+      created_at: new Date().toISOString()
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('marketplace_listings').insert([freshListing]).select().single();
+        if (error) throw error;
+        return { success: true, listing: data as MarketplaceListing };
+      } catch (err: any) {
+        console.error('Supabase listing creation error:', err);
+        return { success: false, error: err.message || 'Supabase write failure.' };
+      }
+    } else {
+      const listings = getStorageItem<MarketplaceListing[]>(MARKETPLACE_KEY, INITIAL_MARKETPLACE_LISTINGS);
+      const output: MarketplaceListing = {
+        id: 'list-' + Math.random().toString(36).substr(2, 9),
+        ...freshListing
+      };
+      listings.push(output);
+      setStorageItem(MARKETPLACE_KEY, listings);
+      return { success: true, listing: output };
+    }
+  },
+
+  async purchaseMarketplaceListing(buyerId: string, listingId: string): Promise<{ success: boolean; listing?: MarketplaceListing; error?: string }> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        // Retrieve listing
+        const { data: listingData, error: lErr } = await supabase.from('marketplace_listings').select('*').eq('id', listingId).single();
+        if (lErr) throw lErr;
+        const listing = listingData as MarketplaceListing;
+
+        if (listing.status !== 'available') {
+          return { success: false, error: 'This account listing is already sold!' };
+        }
+
+        if (listing.seller_id === buyerId) {
+          return { success: false, error: 'You are forbidden from purchasing your own listed account items.' };
+        }
+
+        // Fetch buyer's wallet
+        const { data: bWalletData, error: bWErr } = await supabase.from('wallets').select('*').eq('user_id', buyerId).single();
+        if (bWErr) throw bWErr;
+        const buyerWallet = bWalletData as Wallet;
+
+        if (Number(buyerWallet.balance_bdt) < Number(listing.price_bdt)) {
+          return { success: false, error: `Inadequate balance to purchase. Needs BDT ${listing.price_bdt.toFixed(2)}` };
+        }
+
+        // Update listing state to sold
+        const { data: updatedListing, error: listUpErr } = await supabase
+          .from('marketplace_listings')
+          .update({
+            status: 'sold',
+            buyer_id: buyerId
+          })
+          .eq('id', listingId)
+          .select()
+          .single();
+
+        if (listUpErr) throw listUpErr;
+
+        // Deduct price from buyer wallet
+        await supabase
+          .from('wallets')
+          .update({
+            balance_bdt: Number(buyerWallet.balance_bdt) - Number(listing.price_bdt),
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', buyerWallet.id);
+
+        // Record buyer purchase transaction
+        await supabase.from('transactions').insert([{
+          user_id: buyerId,
+          type: 'Account_Purchase',
+          amount: listing.price_bdt,
+          description: `Bought verified account "${listing.title}" [${listing.platform_type.toUpperCase()}]`
+        }]);
+
+        // Add funds to seller wallet
+        const { data: sWalletData } = await supabase.from('wallets').select('*').eq('user_id', listing.seller_id).maybeSingle();
+        if (sWalletData) {
+          const sellerWallet = sWalletData as Wallet;
+          await supabase
+            .from('wallets')
+            .update({
+              balance_bdt: Number(sellerWallet.balance_bdt) + Number(listing.price_bdt),
+              total_earned_bdt: Number(sellerWallet.total_earned_bdt) + Number(listing.price_bdt),
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', sellerWallet.id);
+        }
+
+        // Record seller sale transaction
+        await supabase.from('transactions').insert([{
+          user_id: listing.seller_id,
+          type: 'Account_Sale',
+          amount: listing.price_bdt,
+          description: `Sold verified account "${listing.title}" to buyer platform user`
+        }]);
+
+        return { success: true, listing: updatedListing as MarketplaceListing };
+      } catch (err: any) {
+        console.error('Supabase marketplace transaction logic crashed:', err);
+        return { success: false, error: err.message || 'Operation failed.' };
+      }
+    } else {
+      // Local storage purchase matching SQL transactions
+      const listings = getStorageItem<MarketplaceListing[]>(MARKETPLACE_KEY, INITIAL_MARKETPLACE_LISTINGS);
+      const listingIdx = listings.findIndex(l => l.id === listingId);
+      if (listingIdx === -1) return { success: false, error: 'Listing not found!' };
+
+      const listing = listings[listingIdx];
+      if (listing.status !== 'available') {
+        return { success: false, error: 'Listing already sold.' };
+      }
+
+      if (listing.seller_id === buyerId) {
+        return { success: false, error: 'You cannot purchase your own account items.' };
+      }
+
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const buyerWIdx = wallets.findIndex(w => w.user_id === buyerId);
+      if (buyerWIdx === -1) return { success: false, error: 'Buyer wallet not found.' };
+
+      const buyerWallet = wallets[buyerWIdx];
+      if (Number(buyerWallet.balance_bdt) < Number(listing.price_bdt)) {
+        return { success: false, error: `Inadequate balance. Listing price is BDT ${listing.price_bdt.toFixed(2)}` };
+      }
+
+      // Deduct from buyer
+      buyerWallet.balance_bdt = Number((Number(buyerWallet.balance_bdt) - listing.price_bdt).toFixed(2));
+      buyerWallet.updated_at = new Date().toISOString();
+      wallets[buyerWIdx] = buyerWallet;
+
+      // Add to seller
+      const sellerWIdx = wallets.findIndex(w => w.user_id === listing.seller_id);
+      if (sellerWIdx !== -1) {
+        const sellerWallet = wallets[sellerWIdx];
+        sellerWallet.balance_bdt = Number((Number(sellerWallet.balance_bdt) + listing.price_bdt).toFixed(2));
+        sellerWallet.total_earned_bdt = Number((Number(sellerWallet.total_earned_bdt) + listing.price_bdt).toFixed(2));
+        sellerWallet.updated_at = new Date().toISOString();
+        wallets[sellerWIdx] = sellerWallet;
+      }
+      setStorageItem(WALLETS_KEY, wallets);
+
+      // Log transaction buyer
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-buy-' + Math.random().toString(36).substr(2, 9),
+        user_id: buyerId,
+        type: 'Account_Purchase',
+        amount: listing.price_bdt,
+        description: `Bought verified account "${listing.title}" [${listing.platform_type.toUpperCase()}]`,
+        created_at: new Date().toISOString()
+      });
+
+      // Log transaction seller
+      transactions.push({
+        id: 'tx-sell-' + Math.random().toString(36).substr(2, 9),
+        user_id: listing.seller_id,
+        type: 'Account_Sale',
+        amount: listing.price_bdt,
+        description: `Sold verified account "${listing.title}" to buyer platform user`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+
+      // Update Listing status to sold
+      listing.status = 'sold';
+      listing.buyer_id = buyerId;
+      listings[listingIdx] = listing;
+      setStorageItem(MARKETPLACE_KEY, listings);
+
+      return { success: true, listing };
+    }
+  },
+
+  async getAdminSales(userId: string): Promise<AdminAccountSale[]> {
+    const ADMIN_SALES_KEY = 'eebd_admin_sales_v1';
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('admin_sales').select('*').eq('user_id', userId).order('created_at', { ascending: false });
+        if (error) throw error;
+        return data as AdminAccountSale[];
+      } catch (e) {
+        console.error('Supabase admin sales error:', e);
+        return getStorageItem<AdminAccountSale[]>(ADMIN_SALES_KEY, []);
+      }
+    } else {
+      return getStorageItem<AdminAccountSale[]>(ADMIN_SALES_KEY, []).reverse();
+    }
+  },
+
+  async submitAdminSale(
+    userId: string,
+    username: string,
+    platformType: 'gmail' | 'fb' | 'insta',
+    accountEmail: string,
+    accountPassword: string,
+    recoveryInfo: string,
+    additionalNotes: string,
+    priceBdt: number
+  ): Promise<{ success: boolean; sale?: AdminAccountSale; error?: string }> {
+    const ADMIN_SALES_KEY = 'eebd_admin_sales_v1';
+    
+    // First, fetch the requirement to verify password matches
+    const requirements = await this.getAdminBuyingRequirements();
+    const platformRequirement = requirements.find(r => r.platform_type === platformType && r.active);
+    
+    const freshSale: AdminAccountSale = {
+      id: 'adminsale-' + Math.random().toString(36).substr(2, 9),
+      user_id: userId,
+      username,
+      platform_type: platformType,
+      account_email: accountEmail,
+      account_password: accountPassword,
+      recovery_info: recoveryInfo,
+      additional_notes: additionalNotes,
+      price_bdt: priceBdt,
+      status: 'Pending',
+      created_at: new Date().toISOString()
+    };
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('admin_sales').insert([freshSale]).select().single();
+        if (error) throw error;
+        
+        return { success: true, sale: data as AdminAccountSale };
+      } catch (err: any) {
+        console.error('Supabase admin sale creation error, falling back locally:', err);
+        const sales = getStorageItem<AdminAccountSale[]>(ADMIN_SALES_KEY, []);
+        sales.push(freshSale);
+        setStorageItem(ADMIN_SALES_KEY, sales);
+        
+        return { success: true, sale: freshSale };
+      }
+    } else {
+      const sales = getStorageItem<AdminAccountSale[]>(ADMIN_SALES_KEY, []);
+      sales.push(freshSale);
+      setStorageItem(ADMIN_SALES_KEY, sales);
+
+      return { success: true, sale: freshSale };
+    }
+  },
+
+  async simulateAdminCheckAndPayout(
+    userId: string,
+    saleId: string,
+    amountBdt: number,
+    platformType: string,
+    accountEmail: string,
+    isSuccessful: boolean = true,
+    customFailureReason: string = ''
+  ): Promise<void> {
+    const ADMIN_SALES_KEY = 'eebd_admin_sales_v1';
+    const finalStatus = isSuccessful ? 'Approved' : 'Rejected';
+    const notes = isSuccessful 
+      ? 'অটোপাইলট অডিট সফল! পাসওয়ার্ড এবং সিকিউরিটি কোড সঠিক পাওয়া গেছে। পেমেন্ট ওয়ালেটে প্রেরণ করা হয়েছে।' 
+      : (customFailureReason || 'অ্যাকাউন্ট ভেরিফিকেশন ব্যর্থ হয়েছে। অনুগ্রহ করে সঠিক তথ্য প্রদান করুন!');
+
+    // 1. Update sale status
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('admin_sales').update({ 
+          status: finalStatus, 
+          admin_notes: notes 
+        }).eq('id', saleId);
+        
+        if (isSuccessful) {
+          // Fetch wallet
+          const { data: wallet } = await supabase.from('wallets').select('*').eq('user_id', userId).maybeSingle();
+          if (wallet) {
+            await supabase.from('wallets').update({
+              balance_bdt: Number(wallet.balance_bdt) + amountBdt,
+              total_earned_bdt: Number(wallet.total_earned_bdt) + amountBdt,
+              updated_at: new Date().toISOString()
+            }).eq('id', wallet.id);
+            
+            await supabase.from('transactions').insert([{
+              user_id: userId,
+              type: 'Account_Sale',
+              amount: amountBdt,
+              description: `অ্যাডমিন ডিরেক্ট সেল - ${platformType.toUpperCase()} (${accountEmail}) অ্যাকাউন্ট অ্যাপ্রুভড ও পেমেন্ট সফল!`
+            }]);
+          }
+        }
+      } catch (e) {
+        console.error('Supabase review simulation mismatch:', e);
+      }
+    }
+
+    // Always keep Localstorage in sync
+    const sales = getStorageItem<AdminAccountSale[]>(ADMIN_SALES_KEY, []);
+    const saleIdx = sales.findIndex(s => s.id === saleId);
+    if (saleIdx !== -1) {
+      // Guard against double payout if already manually checked!
+      if (sales[saleIdx].status !== 'Pending') {
+        return; 
+      }
+      sales[saleIdx].status = finalStatus;
+      sales[saleIdx].admin_notes = notes;
+      setStorageItem(ADMIN_SALES_KEY, sales);
+    }
+
+    if (isSuccessful) {
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(w => w.user_id === userId);
+      if (walletIdx !== -1) {
+        wallets[walletIdx].balance_bdt = Number((Number(wallets[walletIdx].balance_bdt) + amountBdt).toFixed(2));
+        wallets[walletIdx].total_earned_bdt = Number((Number(wallets[walletIdx].total_earned_bdt) + amountBdt).toFixed(2));
+        wallets[walletIdx].updated_at = new Date().toISOString();
+        setStorageItem(WALLETS_KEY, wallets);
+      }
+
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-adminsale-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        type: 'Account_Sale',
+        amount: amountBdt,
+        description: `অ্যাডমিন ডিরেক্ট সেল - ${platformType.toUpperCase()} (${accountEmail}) অ্যাকাউন্ট অ্যাপ্রুভড ও পেমেন্ট সফল!`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+    }
+
+    // Fire simulated status event
+    const event = new CustomEvent('eebd_withdrawal_updated', {
+      detail: { saleId, status: finalStatus, amountBdt }
+    });
+    window.dispatchEvent(event);
+  },
+
+  async getAdminBuyingRequirements(): Promise<AdminBuyingRequirement[]> {
+    const BUY_RULES_KEY = 'eebd_admin_buy_rules_v1';
+    const defaultRules: AdminBuyingRequirement[] = [
+      {
+        id: 'rule-gmail',
+        platform_type: 'gmail',
+        required_password: 'EASY_GMAIL_2026',
+        price_bdt: 150,
+        description_guideline: 'নূন্যতম ৩ মাস পুরোনো সচল গুগোল একাউন্ট হতে হবে।',
+        active: true
+      },
+      {
+        id: 'rule-fb',
+        platform_type: 'fb',
+        required_password: 'EASY_FB_2026',
+        price_bdt: 350,
+        description_guideline: 'কমপক্ষে ১০০+ ফ্রেন্ড থাকতে হবে এবং প্রোফাইল পিকচার থাকতে হবে।',
+        active: true
+      },
+      {
+        id: 'rule-insta',
+        platform_type: 'insta',
+        required_password: 'EASY_INSTA_2026',
+        price_bdt: 250,
+        description_guideline: 'কমপক্ষে ১০টি ইউনিক রিয়াল পোস্ট থাকা রিকোয়ার্ড।',
+        active: true
+      }
+    ];
+
+    return getStorageItem<AdminBuyingRequirement[]>(BUY_RULES_KEY, defaultRules);
+  },
+
+  async saveAdminBuyingRequirements(requirements: AdminBuyingRequirement[]): Promise<boolean> {
+    const BUY_RULES_KEY = 'eebd_admin_buy_rules_v1';
+    setStorageItem(BUY_RULES_KEY, requirements);
+
+    window.dispatchEvent(new CustomEvent('eebd_buy_rules_updated'));
+    return true;
+  },
+
+  async getAllSalesForAdmin(): Promise<AdminAccountSale[]> {
+    const ADMIN_SALES_KEY = 'eebd_admin_sales_v1';
+    return getStorageItem<AdminAccountSale[]>(ADMIN_SALES_KEY, []);
+  },
+
+  async getAllWithdrawalsForAdmin(): Promise<Withdrawal[]> {
+    const WITHDRAWALS_KEY = 'eebd_withdrawals_v1';
+    return getStorageItem<Withdrawal[]>(WITHDRAWALS_KEY, []);
+  },
+
+  async updateSaleStatusByAdmin(
+    saleId: string,
+    status: 'Approved' | 'Rejected' | 'Processing' | 'Pending',
+    adminNotes: string
+  ): Promise<{ success: boolean; error?: string }> {
+    const ADMIN_SALES_KEY = 'eebd_admin_sales_v1';
+    
+    const sales = getStorageItem<AdminAccountSale[]>(ADMIN_SALES_KEY, []);
+    const saleIdx = sales.findIndex(s => s.id === saleId);
+    if (saleIdx === -1) {
+      return { success: false, error: 'Account sale submission not found!' };
+    }
+
+    const sale = sales[saleIdx];
+    const previousStatus = sale.status;
+    
+    sale.status = status;
+    sale.admin_notes = adminNotes;
+    sales[saleIdx] = sale;
+    setStorageItem(ADMIN_SALES_KEY, sales);
+
+    if (status === 'Approved' && previousStatus !== 'Approved') {
+      const amountBdt = sale.price_bdt;
+      const userId = sale.user_id;
+
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(w => w.user_id === userId);
+      if (walletIdx !== -1) {
+        wallets[walletIdx].balance_bdt = Number((Number(wallets[walletIdx].balance_bdt) + amountBdt).toFixed(2));
+        wallets[walletIdx].total_earned_bdt = Number((Number(wallets[walletIdx].total_earned_bdt) + amountBdt).toFixed(2));
+        wallets[walletIdx].updated_at = new Date().toISOString();
+        setStorageItem(WALLETS_KEY, wallets);
+      }
+
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-adminsale-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        type: 'Account_Sale',
+        amount: amountBdt,
+        description: `অ্যাডমিন প্যানেল ক্যাশিং - ${sale.platform_type.toUpperCase()} (${sale.account_email}) অ্যাকাউন্ট অ্যাপ্রুভ!`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+    } else if (status !== 'Approved' && previousStatus === 'Approved') {
+      // Revert/Void the payout because the admin changed status away from Approved
+      const amountBdt = sale.price_bdt;
+      const userId = sale.user_id;
+
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(w => w.user_id === userId);
+      if (walletIdx !== -1) {
+        wallets[walletIdx].balance_bdt = Number(Math.max(0, Number(wallets[walletIdx].balance_bdt) - amountBdt).toFixed(2));
+        wallets[walletIdx].total_earned_bdt = Number(Math.max(0, Number(wallets[walletIdx].total_earned_bdt) - amountBdt).toFixed(2));
+        wallets[walletIdx].updated_at = new Date().toISOString();
+        setStorageItem(WALLETS_KEY, wallets);
+      }
+
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-adminsale-void-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        type: 'Account_Sale', // Valid TransactionType
+        amount: amountBdt,
+        description: `অ্যাডমিন বাতিল অনুমোদন - ${sale.platform_type.toUpperCase()} (${sale.account_email}) এর পেমেন্ট রিভয়েড/বাতিল করা হয়েছে।`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        await supabase.from('admin_sales').update({ 
+          status, 
+          admin_notes: adminNotes 
+        }).eq('id', saleId);
+      } catch (e) {
+        console.error('Supabase status manual approve error:', e);
+      }
+    }
+
+    const event = new CustomEvent('eebd_withdrawal_updated', {
+      detail: { saleId, status, amountBdt: sale.price_bdt }
+    });
+    window.dispatchEvent(event);
+
+    return { success: true };
+  },
+
+  async updateWithdrawalStatusByAdmin(
+    withdrawalId: string,
+    status: WithdrawalStatus,
+    referenceId: string = ''
+  ): Promise<{ success: boolean; error?: string }> {
+    const WITHDRAWALS_KEY = 'eebd_withdrawals_v1';
+    const withdrawals = getStorageItem<Withdrawal[]>(WITHDRAWALS_KEY, []);
+    const idx = withdrawals.findIndex(w => w.id === withdrawalId);
+    if (idx === -1) return { success: false, error: 'Withdrawal not found!' };
+
+    const w = withdrawals[idx];
+    const prevStatus = w.status;
+
+    if (prevStatus === status) {
+      if (referenceId) {
+        w.reference_id = referenceId;
+        withdrawals[idx] = w;
+        setStorageItem(WITHDRAWALS_KEY, withdrawals);
+      }
+      return { success: true };
+    }
+
+    // Apply the new status
+    w.status = status;
+    w.processed_at = new Date().toISOString();
+    if (referenceId) w.reference_id = referenceId;
+    withdrawals[idx] = w;
+    setStorageItem(WITHDRAWALS_KEY, withdrawals);
+
+    // If transitioned to Rejected from non-Rejected, we must refund the user balance
+    if (status === 'Rejected' && prevStatus !== 'Rejected') {
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(wl => wl.user_id === w.user_id);
+      if (walletIdx !== -1) {
+        wallets[walletIdx].balance_bdt = Number((Number(wallets[walletIdx].balance_bdt) + w.amount_bdt).toFixed(2));
+        wallets[walletIdx].total_withdrawn_bdt = Number(Math.max(0, Number(wallets[walletIdx].total_withdrawn_bdt) - w.amount_bdt).toFixed(2));
+        setStorageItem(WALLETS_KEY, wallets);
+      }
+
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-refund-' + Math.random().toString(36).substr(2, 9),
+        user_id: w.user_id,
+        type: 'Withdrawal_Rejected',
+        amount: w.amount_bdt,
+        description: `উইথড্র বাতিল এবং রিফান্ড করা হয়েছে (কারনঃ ভুল নম্বর বা মেম্বারশিপ সম্পর্কিত)`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+    }
+
+    // If transitioned from Rejected back to any other status, we must de-credit/deduct the wallet again
+    if (prevStatus === 'Rejected' && status !== 'Rejected') {
+      const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+      const walletIdx = wallets.findIndex(wl => wl.user_id === w.user_id);
+      if (walletIdx !== -1) {
+        wallets[walletIdx].balance_bdt = Number(Math.max(0, Number(wallets[walletIdx].balance_bdt) - w.amount_bdt).toFixed(2));
+        wallets[walletIdx].total_withdrawn_bdt = Number((Number(wallets[walletIdx].total_withdrawn_bdt) + w.amount_bdt).toFixed(2));
+        setStorageItem(WALLETS_KEY, wallets);
+      }
+
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-deduct-' + Math.random().toString(36).substr(2, 9),
+        user_id: w.user_id,
+        type: 'Withdrawal_Pending',
+        amount: w.amount_bdt,
+        description: `অ্যাডমিন পুনরায় উইথড্র রিভিউ স্ট্যাটাসে পঠিয়েছেন (${status})। ব্যালেন্স পুনরায় ডিডাক্ট করা হল।`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+    }
+
+    // If status becomes Approved and wasn't Approved initially
+    if (status === 'Approved' && prevStatus !== 'Approved') {
+      const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+      transactions.push({
+        id: 'tx-appv-' + Math.random().toString(36).substr(2, 9),
+        user_id: w.user_id,
+        type: 'Withdrawal_Approved',
+        amount: w.amount_bdt,
+        description: `উইথড্র রিকোয়েস্ট সফলভাবে পেমেন্ট করা হয়েছে (নম্বর: ${w.account_number})`,
+        created_at: new Date().toISOString()
+      });
+      setStorageItem(TRANSACTIONS_KEY, transactions);
+    }
+
+    window.dispatchEvent(new CustomEvent('eebd_withdrawal_updated'));
+    return { success: true };
+  },
+
+  async getAllUsersForAdmin(): Promise<User[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('users').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        return (data as User[]) || [];
+      } catch (err) {
+        console.error('Error fetching Supabase users:', err);
+      }
+    }
+    return getStorageItem<User[]>(USERS_KEY, []);
+  },
+
+  async getAllWalletsForAdmin(): Promise<Wallet[]> {
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('wallets').select('*');
+        if (error) throw error;
+        return (data as Wallet[]) || [];
+      } catch (err) {
+        console.error('Error fetching Supabase wallets:', err);
+      }
+    }
+    return getStorageItem<Wallet[]>(WALLETS_KEY, []);
+  },
+
+  async suspendUserToggle(userId: string): Promise<{ success: boolean; is_suspended: boolean; error?: string }> {
+    let suspendedState = false;
+    
+    // Always update local storage
+    const users = getStorageItem<User[]>(USERS_KEY, []);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx !== -1) {
+      suspendedState = !users[idx].is_suspended;
+      users[idx].is_suspended = suspendedState;
+      setStorageItem(USERS_KEY, users);
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: uData } = await supabase.from('users').select('is_suspended').eq('id', userId).maybeSingle();
+        if (uData) {
+          suspendedState = !uData.is_suspended;
+        }
+        const { error } = await supabase.from('users').update({ is_suspended: suspendedState }).eq('id', userId);
+        if (error) throw error;
+        return { success: true, is_suspended: suspendedState };
+      } catch (err: any) {
+        console.error('Error updating Supabase user suspend state:', err);
+        return { success: false, is_suspended: suspendedState, error: err.message };
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('eebd_users_updated'));
+    return { success: true, is_suspended: suspendedState };
+  },
+
+  async verifyUserToggle(userId: string): Promise<{ success: boolean; is_verified: boolean; error?: string }> {
+    let verifiedState = false;
+    
+    // Always update local storage
+    const users = getStorageItem<User[]>(USERS_KEY, []);
+    const idx = users.findIndex(u => u.id === userId);
+    if (idx !== -1) {
+      verifiedState = !users[idx].is_verified;
+      users[idx].is_verified = verifiedState;
+      setStorageItem(USERS_KEY, users);
+    }
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: uData } = await supabase.from('users').select('is_verified').eq('id', userId).maybeSingle();
+        if (uData) {
+          verifiedState = !uData.is_verified;
+        }
+        const { error } = await supabase.from('users').update({ is_verified: verifiedState }).eq('id', userId);
+        if (error) throw error;
+        return { success: true, is_verified: verifiedState };
+      } catch (err: any) {
+        console.error('Error updating Supabase user verify state:', err);
+        return { success: false, is_verified: verifiedState, error: err.message };
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('eebd_users_updated'));
+    window.dispatchEvent(new CustomEvent('eebd_withdrawal_updated'));
+    return { success: true, is_verified: verifiedState };
+  },
+
+  async createNewTaskByAdmin(taskData: Omit<Task, 'id' | 'created_at'>): Promise<{ success: boolean; task?: Task; error?: string }> {
+    const newTask: Task = {
+      id: 'task-' + Math.random().toString(36).substr(2, 9),
+      ...taskData,
+      created_at: new Date().toISOString()
+    };
+
+    const localTasks = getStorageItem<Task[]>(TASKS_KEY, INITIAL_TASKS);
+    localTasks.unshift(newTask);
+    setStorageItem(TASKS_KEY, localTasks);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data, error } = await supabase.from('tasks').insert([newTask]).select().single();
+        if (error) throw error;
+        return { success: true, task: data as Task };
+      } catch (err: any) {
+        console.error('Error inserting Supabase task:', err);
+        return { success: true, task: newTask };
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('eebd_tasks_updated'));
+    window.dispatchEvent(new CustomEvent('eebd_withdrawal_updated'));
+    return { success: true, task: newTask };
+  },
+
+  async deleteTaskByAdmin(taskId: string): Promise<{ success: boolean; error?: string }> {
+    const localTasks = getStorageItem<Task[]>(TASKS_KEY, INITIAL_TASKS);
+    const filtered = localTasks.filter(t => t.id !== taskId);
+    setStorageItem(TASKS_KEY, filtered);
+
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { error } = await supabase.from('tasks').delete().eq('id', taskId);
+        if (error) throw error;
+      } catch (err: any) {
+        console.error('Error deleting Supabase task:', err);
+        return { success: false, error: err.message };
+      }
+    }
+
+    window.dispatchEvent(new CustomEvent('eebd_tasks_updated'));
+    window.dispatchEvent(new CustomEvent('eebd_withdrawal_updated'));
+    return { success: true };
+  },
+
+  async adjustUserBalanceByAdmin(
+    userId: string,
+    amount: number,
+    actionType: 'add' | 'deduct',
+    description: string
+  ): Promise<{ success: boolean; error?: string; newBalance?: number }> {
+    const finalAmount = actionType === 'add' ? amount : -amount;
+    let newBalance = 0;
+
+    // 1. Supabase integration
+    if (isSupabaseConfigured && supabase) {
+      try {
+        const { data: wallet, error: fetchError } = await supabase
+          .from('wallets')
+          .select('*')
+          .eq('user_id', userId)
+          .maybeSingle();
+
+        if (fetchError) throw fetchError;
+        
+        if (wallet) {
+          const calcBalance = Number((Number(wallet.balance_bdt) + finalAmount).toFixed(2));
+          newBalance = calcBalance;
+          
+          const updateObj: any = {
+            balance_bdt: calcBalance,
+            updated_at: new Date().toISOString()
+          };
+          if (actionType === 'add') {
+            updateObj.total_earned_bdt = Number((Number(wallet.total_earned_bdt) + amount).toFixed(2));
+          }
+          await supabase.from('wallets').update(updateObj).eq('id', wallet.id);
+
+          await supabase.from('transactions').insert([{
+            user_id: userId,
+            type: actionType === 'add' ? 'Reward' : 'Withdrawal_Pending',
+            amount: finalAmount,
+            description: description || `এডমিন কর্তৃক ব্যালেন্স ${actionType === 'add' ? 'যোগ' : 'কর্তন'} করা হয়েছে: ৳ ${amount} BDT`
+          }]);
+        } else {
+          return { success: false, error: 'User wallet not found in Supabase.' };
+        }
+      } catch (err: any) {
+        console.error('Error in adjustUserBalanceByAdmin in Supabase:', err);
+        return { success: false, error: err.message };
+      }
+    }
+
+    // 2. Always keep localStorage in sync
+    const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+    const walletIdx = wallets.findIndex(w => w.user_id === userId);
+    if (walletIdx !== -1) {
+      const w = wallets[walletIdx];
+      const calcBalance = Number((Number(w.balance_bdt) + finalAmount).toFixed(2));
+      w.balance_bdt = calcBalance;
+      if (actionType === 'add') {
+        w.total_earned_bdt = Number((Number(w.total_earned_bdt) + amount).toFixed(2));
+      }
+      w.updated_at = new Date().toISOString();
+      wallets[walletIdx] = w;
+      setStorageItem(WALLETS_KEY, wallets);
+      newBalance = calcBalance;
+    } else {
+      // Create wallet if it doesn't exist locally
+      const w: Wallet = {
+        id: 'wallet-' + Math.random().toString(36).substr(2, 9),
+        user_id: userId,
+        balance_bdt: finalAmount > 0 ? finalAmount : 0,
+        total_earned_bdt: finalAmount > 0 ? finalAmount : 0,
+        total_withdrawn_bdt: 0,
+        updated_at: new Date().toISOString()
+      };
+      wallets.push(w);
+      setStorageItem(WALLETS_KEY, wallets);
+      newBalance = w.balance_bdt;
+    }
+
+    // Append standard transaction history
+    const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+    transactions.push({
+      id: 'tx-adminadj-' + Math.random().toString(36).substr(2, 9),
+      user_id: userId,
+      type: actionType === 'add' ? 'Reward' : 'Withdrawal_Pending',
+      amount: finalAmount,
+      description: description || `এডমিন কর্তৃক ব্যালেন্স ${actionType === 'add' ? 'যোগ' : 'কর্তন'} করা হয়েছে: ৳ ${amount} BDT`,
+      created_at: new Date().toISOString()
+    });
+    setStorageItem(TRANSACTIONS_KEY, transactions);
+
+    // Fire events to notify real-time clients
+    window.dispatchEvent(new CustomEvent('eebd_users_updated'));
+    window.dispatchEvent(new CustomEvent('eebd_withdrawal_updated'));
+    
+    return { success: true, newBalance };
+  }
+};
+
+// --- INITIAL DATA & MLM RULES CONFIGS ---
+export type MFSKeyType = 'bKash' | 'Nagad' | 'Rocket';
+
+export const COMMISSION_AMOUNTS: { [level: number]: number } = {
+  1: 40,
+  2: 10,
+  3: 5,
+  4: 2,
+  5: 2,
+  6: 2,
+  7: 1,
+  8: 1,
+  9: 1,
+  10: 1
+};
+
+// Recursive distribution function for LocalStorage
+export function distributeCommissionsRecursivelyLocal(referredByCode: string, level: number = 1): void {
+  if (level > 10 || !referredByCode) return;
+  const users = getStorageItem<User[]>(USERS_KEY, []);
+  const referrer = users.find(u => u.referral_code === referredByCode);
+  if (!referrer) return;
+
+  const reward = COMMISSION_AMOUNTS[level] || 0;
+  if (reward > 0) {
+    const wallets = getStorageItem<Wallet[]>(WALLETS_KEY, []);
+    const walletIdx = wallets.findIndex(w => w.user_id === referrer.id);
+    if (walletIdx !== -1) {
+      wallets[walletIdx].balance_bdt = Number((Number(wallets[walletIdx].balance_bdt) + reward).toFixed(2));
+      wallets[walletIdx].total_earned_bdt = Number((Number(wallets[walletIdx].total_earned_bdt) + reward).toFixed(2));
+      wallets[walletIdx].updated_at = new Date().toISOString();
+      setStorageItem(WALLETS_KEY, wallets);
+    }
+
+    const transactions = getStorageItem<Transaction[]>(TRANSACTIONS_KEY, []);
+    transactions.push({
+      id: 'tx-ref-' + Math.random().toString(36).substr(2, 9),
+      user_id: referrer.id,
+      type: 'Referral_Bonus',
+      amount: reward,
+      description: `Affiliate Generation ${level} Commission from user activation`,
+      level_generation: level,
+      created_at: new Date().toISOString()
+    });
+    setStorageItem(TRANSACTIONS_KEY, transactions);
+  }
+
+  if (referrer.referred_by_code) {
+    distributeCommissionsRecursivelyLocal(referrer.referred_by_code, level + 1);
+  }
+}
+
+// Recursive distribution function for Supabase
+export async function distributeCommissionsRecursivelySupabase(referredByCode: string, level: number = 1): Promise<void> {
+  if (level > 10 || !referredByCode || !supabase) return;
+  
+  try {
+    const { data: referrer, error: refError } = await supabase
+      .from('users')
+      .select('id, referred_by_code')
+      .eq('referral_code', referredByCode)
+      .maybeSingle();
+
+    if (refError || !referrer) return;
+
+    const reward = COMMISSION_AMOUNTS[level] || 0;
+    if (reward > 0) {
+      const { data: wallet, error: wError } = await supabase
+        .from('wallets')
+        .select('*')
+        .eq('user_id', referrer.id)
+        .maybeSingle();
+
+      if (wallet) {
+        await supabase
+          .from('wallets')
+          .update({
+            balance_bdt: Number(wallet.balance_bdt) + reward,
+            total_earned_bdt: Number(wallet.total_earned_bdt) + reward,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', wallet.id);
+
+        await supabase.from('transactions').insert([{
+          user_id: referrer.id,
+          type: 'Referral_Bonus',
+          amount: reward,
+          description: `Affiliate Generation ${level} Commission from user activation`,
+          level_generation: level
+        }]);
+      }
+    }
+
+    if (referrer.referred_by_code) {
+      await distributeCommissionsRecursivelySupabase(referrer.referred_by_code, level + 1);
+    }
+  } catch (err) {
+    console.error(`Error in Supabase MLM distribution at level ${level}:`, err);
+  }
+}
+
